@@ -63,8 +63,8 @@
       previousStartMinutes = startMinutes;
       const start = day.date + rollover * DAY_MS + startMinutes * 60000 - OFFSET_MS;
       const startLabel = entry[1].padStart(5, '0');
-      if (previousEntryStart !== null && start <= previousEntryStart) throw new Error('Слоты должны идти по порядку времени: ' + line);
-      if (isBoundary && (!pendingSlot || pendingSlot.dayId !== day.id)) throw new Error('Не указан слот перед перерывом или концом в строке ' + (lineIndex + 1));
+      if (previousEntryStart !== null && start <= previousEntryStart) throw new Error('Игры должны идти по порядку времени: ' + line);
+      if (isBoundary && (!pendingSlot || pendingSlot.dayId !== day.id)) throw new Error('Не указана игра перед перерывом или концом в строке ' + (lineIndex + 1));
       // The next start closes the preceding slot, including across midnight or a day heading.
       if (pendingSlot) {
         pendingSlot.end = start;
@@ -92,7 +92,7 @@
       slots.push(slot);
       pendingSlot = slot;
     }
-    if (!slots.length || days.some(item => !item.slots.length)) throw new Error('Расписание не содержит слотов или содержит пустой день.');
+    if (!slots.length || days.some(item => !item.slots.length)) throw new Error('Расписание не содержит игр или содержит пустой день.');
     return { days, slots, platforms: [...new Set(slots.map(slot => slot.platform))].sort((a, b) => a.localeCompare(b)) };
   }
 

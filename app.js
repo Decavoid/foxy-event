@@ -92,10 +92,10 @@
     return '<time datetime="' + new Date(slot.start).toISOString() + '">' + escape(timeFormat.format(slot.start)) + '</time> — ' + (slot.end === null ? '<span aria-label="Время окончания неизвестно">?</span>' : '<time datetime="' + new Date(slot.end).toISOString() + '">' + escape(timeFormat.format(slot.end)) + '</time>');
   }
 
-  function pluralSlots(count) {
+  function pluralGames(count) {
     const last = count % 10;
     const teen = count % 100;
-    return count + ' ' + (teen >= 11 && teen <= 14 ? 'слотов' : last === 1 ? 'слот' : last >= 2 && last <= 4 ? 'слота' : 'слотов');
+    return count + ' ' + (teen >= 11 && teen <= 14 ? 'игр' : last === 1 ? 'игра' : last >= 2 && last <= 4 ? 'игры' : 'игр');
   }
 
   function renderTabs() {
@@ -120,7 +120,7 @@
       : state.next
         ? 'Следующий эфир — ' + dateLabel(state.next.start) + ' в ' + timeFormat.format(state.next.start) + ' по вашему времени.'
         : state.open
-          ? 'Время окончания последнего слота не указано.'
+          ? 'Время окончания последней игры не указано.'
           : 'Марафон завершён. Спасибо всем, кто был с нами!';
     $('stream-countdown').hidden = !!state.current || !state.next;
     $('stream-countdown').textContent = '';
@@ -133,10 +133,10 @@
     let nowCard;
     const decoration = '<svg class="now-decoration" viewBox="0 0 88 64" fill="currentColor" aria-hidden="true"><path d="M16 0h8v8h-8zM64 0h8v8h-8zM24 8h8v8h-8zM56 8h8v8h-8zM16 16h56v8H16zM8 24h16v8H8zM32 24h24v8H32zM64 24h16v8H64zM0 32h88v8H0zM0 40h8v16H0zM16 40h56v8H16zM80 40h8v16h-8zM16 48h8v8h-8zM64 48h8v8h-8zM24 56h16v8H24zM48 56h16v8H48z"/></svg>';
     if (current) {
-      nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span><span>' + (isUnknown ? 'ПОСЛЕДНИЙ ЗАПЛАНИРОВАННЫЙ СЛОТ' : 'СЕЙЧАС ПО РАСПИСАНИЮ · ИГРА #' + current.numberInDay) + '</span></p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(slotDateLabel(current)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущего слота" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
+      nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span><span>' + (isUnknown ? 'ПОСЛЕДНЯЯ ЗАПЛАНИРОВАННАЯ ИГРА' : 'СЕЙЧАС ПО РАСПИСАНИЮ · ИГРА #' + current.numberInDay) + '</span></p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(slotDateLabel(current)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущей игры" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
     } else {
       const titles = { before: 'Скоро нажмём START.', break: 'Эфир завершён.', finished: 'Спасибо за игру!' };
-      const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + timeFormat.format(state.next.start) : '') + '. Выбирай, что посмотреть.', break: 'Сейчас перерыв. Вернёмся к началу следующего слота.', finished: 'Все слоты по расписанию завершены. Любимые игры и участники остаются здесь.' };
+      const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + timeFormat.format(state.next.start) : '') + '. Выбирай, что посмотреть.', break: 'Сейчас перерыв. Вернёмся к началу следующей игры.', finished: 'Все игры по расписанию завершены. Любимые игры и участники остаются здесь.' };
       nowCard = '<article class="now-card is-idle"><p class="eyebrow">' + ({ before: 'ДО НАЧАЛА МАРАФОНА', break: 'МЕЖДУ ЭФИРАМИ', finished: 'ИВЕНТ ЗАВЕРШЁН' }[state.phase]) + '</p><h2>' + titles[state.phase] + '</h2><p class="now-game">' + escape(copy[state.phase]) + '</p><div class="now-bottom"><span id="now-remaining"></span><span>Местное время</span></div></article>';
     }
     let nextCard;
@@ -144,18 +144,18 @@
       const next = state.next;
       nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">СЛЕДУЮЩИЙ УРОВЕНЬ</p><span id="next-countdown" class="next-countdown"></span></div><h3>' + prettyParticipant(next.participant) + '</h3><p class="next-game">' + escape(next.game) + '</p><div class="next-footer"><span class="next-time">' + escape(timeRange(next)) + (localDate(next.start) !== localDate(Date.now()) || crossesLocalMidnight(next) ? '<br>' + escape(slotDateLabel(next)) : '') + '</span><span>' + badge(next) + '</span><span class="next-arrow" aria-hidden="true">↗</span></div></article>';
     } else {
-      nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">ФИНАЛЬНЫЙ УРОВЕНЬ</p><span aria-hidden="true">✦</span></div><h3>Вот это марафон.</h3><p class="next-game">' + (isUnknown ? 'Это последний слот программы. Время его завершения не указано.' : 'Впереди нет запланированных слотов. Спасибо всем, кто был с нами!') + '</p><div class="next-footer"><span class="next-time">' + pluralSlots(schedule.slots.length) + ' · ' + schedule.days.length + ' дня</span><span class="next-arrow" aria-hidden="true">♡</span></div></article>';
+      nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">ФИНАЛЬНЫЙ УРОВЕНЬ</p><span aria-hidden="true">✦</span></div><h3>Вот это марафон.</h3><p class="next-game">' + (isUnknown ? 'Это последняя игра программы. Время её завершения не указано.' : 'Впереди нет запланированных игр. Спасибо всем, кто был с нами!') + '</p><div class="next-footer"><span class="next-time">' + pluralGames(schedule.slots.length) + ' · ' + schedule.days.length + ' дня</span><span class="next-arrow" aria-hidden="true">♡</span></div></article>';
     }
     $('broadcast').innerHTML = nowCard + nextCard;
-    $('slot-announcement').textContent = state.current ? 'Сейчас по расписанию, игра #' + state.current.numberInDay + ': ' + state.current.participant + ', ' + state.current.game : state.open ? 'Последний запланированный слот: ' + state.open.participant + '. Время окончания неизвестно.' : $('stream-status').textContent + '. ' + $('stream-description').textContent;
-    $('jump-label').textContent = state.current ? 'К текущему слоту' : state.open ? 'К последнему слоту' : state.next ? 'К следующему слоту' : 'К последнему слоту';
+    $('slot-announcement').textContent = state.current ? 'Сейчас по расписанию, игра #' + state.current.numberInDay + ': ' + state.current.participant + ', ' + state.current.game : state.open ? 'Последняя запланированная игра: ' + state.open.participant + '. Время окончания неизвестно.' : $('stream-status').textContent + '. ' + $('stream-description').textContent;
+    $('jump-label').textContent = state.current ? 'К текущей игре' : state.open ? 'К последней игре' : state.next ? 'К следующей игре' : 'К последней игре';
     $('jump-live-dot').hidden = !state.current;
     $('jump-current').disabled = !state.focus;
   }
 
   function renderRow(slot, now) {
     const status = core.slotStatus(slot, state, now);
-    const statusText = { active: '<span class="live-dot"></span><span>СЕЙЧАС<br>ИГРА #' + slot.numberInDay + '</span>', open: 'Окончание<br>неизвестно', past: '<span class="status-check" aria-hidden="true">✓</span>Слот прошёл', upcoming: 'Впереди' }[status];
+    const statusText = { active: '<span class="live-dot"></span><span>СЕЙЧАС<br>ИГРА #' + slot.numberInDay + '</span>', open: 'Окончание<br>неизвестно', past: '<span class="status-check" aria-hidden="true">✓</span>Игра завершена', upcoming: 'Впереди' }[status];
     const sub = [];
     const differentDate = localDate(slot.start) !== slot.dayId;
     const crossesMidnight = crossesLocalMidnight(slot);
@@ -183,7 +183,7 @@
     $('schedule-content').innerHTML = content;
     $('schedule-content').setAttribute('aria-busy', 'false');
     $('empty-state').hidden = count > 0;
-    $('result-count').textContent = pluralSlots(count);
+    $('result-count').textContent = pluralGames(count);
   }
 
   function tick() {
@@ -204,7 +204,7 @@
     }
     if (state.current) {
       const progress = Math.max(0, Math.min(100, 100 * (now - state.current.start) / (state.current.end - state.current.start)));
-      $('now-remaining').textContent = 'До конца слота ' + countdown(state.current.end - now);
+      $('now-remaining').textContent = 'До конца игры ' + countdown(state.current.end - now);
       $('now-progress').style.width = progress.toFixed(2) + '%';
       $('now-progress').parentElement.setAttribute('aria-valuenow', String(Math.floor(progress)));
     } else if (state.next) {

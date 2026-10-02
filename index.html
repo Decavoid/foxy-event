@@ -58,7 +58,7 @@
     </section>
 
     <div class="event-facts" aria-label="Об ивенте">
-      <span><strong>03</strong> дня марафона</span><span><strong id="slot-count">49</strong> игровых слотов</span><span><strong id="platform-count">12</strong> платформ</span>
+      <span><strong>03</strong> дня марафона</span><span><strong id="slot-count">49</strong> игр</span><span><strong id="platform-count">12</strong> платформ</span>
       <span class="facts-time"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>Время — в вашем часовом поясе</span>
     </div>
 
@@ -74,14 +74,14 @@
       </div>
     </section>
 
-    <section id="broadcast" class="broadcast" aria-label="Текущий и следующий слот">
+    <section id="broadcast" class="broadcast" aria-label="Текущая и следующая игра">
       <div class="now-card is-loading"><p class="eyebrow">ЗАГРУЖАЕМ РАСПИСАНИЕ</p><h2>Готовим следующий уровень…</h2></div>
     </section>
     <p id="source-notice" class="source-notice" role="status" hidden></p>
     <p id="slot-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p>
 
     <section id="schedule" class="schedule-section" aria-labelledby="schedule-title">
-      <div class="section-heading"><div><p class="eyebrow">ВЫБИРАЙ СВОЙ УРОВЕНЬ</p><h2 id="schedule-title">Расписание</h2></div><button id="jump-current" class="button button-outline" type="button"><span id="jump-live-dot" class="live-dot" aria-hidden="true" hidden></span><span id="jump-label">К текущему слоту</span><span aria-hidden="true">↗</span></button></div>
+      <div class="section-heading"><div><p class="eyebrow">ВЫБИРАЙ СВОЙ УРОВЕНЬ</p><h2 id="schedule-title">Расписание</h2></div><button id="jump-current" class="button button-outline" type="button"><span id="jump-live-dot" class="live-dot" aria-hidden="true" hidden></span><span id="jump-label">К текущей игре</span><span aria-hidden="true">↗</span></button></div>
       <div id="day-tabs" class="day-tabs" role="group" aria-label="День марафона"></div>
       <div class="schedule-tools">
         <div class="search-field"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><label class="sr-only" for="search">Найти игру или участника</label><input id="search" type="search" placeholder="Найти игру или участника…" autocomplete="off"><span class="search-hint" aria-hidden="true">/</span></div>
@@ -90,10 +90,10 @@
       </div>
       <div id="schedule-content" class="schedule-content" aria-busy="true"></div>
       <div id="empty-state" class="empty-state" hidden><span aria-hidden="true">⌕</span><h3>Ничего не нашлось</h3><p>Попробуй другую игру, участника или платформу.</p><button id="reset-filters" class="button button-dark" type="button">Сбросить фильтры</button></div>
-      <p class="schedule-note"><span aria-hidden="true">↳</span> Вкладки — дни программы марафона. Если местная дата слота отличается от дня программы, она указана рядом со временем.</p>
+      <p class="schedule-note"><span aria-hidden="true">↳</span> Вкладки — дни программы марафона. Если местная дата начала игры отличается от дня программы, она указана рядом со временем.</p>
     </section>
 
-    <aside class="closing-note"><span class="closing-icon" aria-hidden="true">✳</span><div><h2>Сохраняй расписание. Возвращайся за ностальгией.</h2><p>Текущий слот подсвечивается автоматически. Время указано по расписанию и может отличаться от фактического эфира.</p></div><a class="text-link" href="./Schedule.txt" download>Расписание .txt (UTC+3) <span aria-hidden="true">↗</span></a></aside>
+    <aside class="closing-note"><span class="closing-icon" aria-hidden="true">✳</span><div><h2>Сохраняй расписание. Возвращайся за ностальгией.</h2><p>Текущая игра подсвечивается автоматически. Время указано по расписанию и может отличаться от фактического эфира.</p></div><a class="text-link" href="./Schedule.txt" download>Расписание .txt (UTC+3) <span aria-hidden="true">↗</span></a></aside>
   </main>
   <footer class="site-footer wrap"><span class="footer-brand">РЕТРО / МАРАФОН <span>© 2026</span></span><span>Играем вместе. Как раньше.</span><a href="#hero-title">Наверх ↑</a></footer>
   <noscript><div class="noscript">Для отображения местного времени и автоматической подсветки включите JavaScript. <a href="./Schedule.txt">Открыть расписание в UTC+3</a>.</div></noscript>
