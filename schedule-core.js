@@ -80,6 +80,7 @@
       const game = match[2].replace(/\s*\/\s*$/, '').trim();
       const slot = {
         id: 'slot-' + (slots.length + 1), dayId: day.id, start, end: null,
+        numberInDay: day.slots.length + 1,
         startLabel, endLabel: null,
         participant: match[1].trim(), game, platform, tags,
         actualDate: eventDate(start), endDate: null,

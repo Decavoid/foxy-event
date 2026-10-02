@@ -133,7 +133,7 @@
     let nowCard;
     const decoration = '<svg class="now-decoration" viewBox="0 0 88 64" fill="currentColor" aria-hidden="true"><path d="M16 0h8v8h-8zM64 0h8v8h-8zM24 8h8v8h-8zM56 8h8v8h-8zM16 16h56v8H16zM8 24h16v8H8zM32 24h24v8H32zM64 24h16v8H64zM0 32h88v8H0zM0 40h8v16H0zM16 40h56v8H16zM80 40h8v16h-8zM16 48h8v8h-8zM64 48h8v8h-8zM24 56h16v8H24zM48 56h16v8H48z"/></svg>';
     if (current) {
-      nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span>' + (isUnknown ? 'ПОСЛЕДНИЙ ЗАПЛАНИРОВАННЫЙ СЛОТ' : 'СЕЙЧАС ПО РАСПИСАНИЮ') + '</p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(slotDateLabel(current)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущего слота" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
+      nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span><span>' + (isUnknown ? 'ПОСЛЕДНИЙ ЗАПЛАНИРОВАННЫЙ СЛОТ' : 'СЕЙЧАС ПО РАСПИСАНИЮ · ИГРА #' + current.numberInDay) + '</span></p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(slotDateLabel(current)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущего слота" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
     } else {
       const titles = { before: 'Скоро нажмём START.', break: 'Эфир завершён.', finished: 'Спасибо за игру!' };
       const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + timeFormat.format(state.next.start) : '') + '. Выбирай, что посмотреть.', break: 'Сейчас перерыв. Вернёмся к началу следующего слота.', finished: 'Все слоты по расписанию завершены. Любимые игры и участники остаются здесь.' };
@@ -147,7 +147,7 @@
       nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">ФИНАЛЬНЫЙ УРОВЕНЬ</p><span aria-hidden="true">✦</span></div><h3>Вот это марафон.</h3><p class="next-game">' + (isUnknown ? 'Это последний слот программы. Время его завершения не указано.' : 'Впереди нет запланированных слотов. Спасибо всем, кто был с нами!') + '</p><div class="next-footer"><span class="next-time">' + pluralSlots(schedule.slots.length) + ' · ' + schedule.days.length + ' дня</span><span class="next-arrow" aria-hidden="true">♡</span></div></article>';
     }
     $('broadcast').innerHTML = nowCard + nextCard;
-    $('slot-announcement').textContent = state.current ? 'Сейчас по расписанию: ' + state.current.participant + ', ' + state.current.game : state.open ? 'Последний запланированный слот: ' + state.open.participant + '. Время окончания неизвестно.' : $('stream-status').textContent + '. ' + $('stream-description').textContent;
+    $('slot-announcement').textContent = state.current ? 'Сейчас по расписанию, игра #' + state.current.numberInDay + ': ' + state.current.participant + ', ' + state.current.game : state.open ? 'Последний запланированный слот: ' + state.open.participant + '. Время окончания неизвестно.' : $('stream-status').textContent + '. ' + $('stream-description').textContent;
     $('jump-label').textContent = state.current ? 'К текущему слоту' : state.open ? 'К последнему слоту' : state.next ? 'К следующему слоту' : 'К последнему слоту';
     $('jump-live-dot').hidden = !state.current;
     $('jump-current').disabled = !state.focus;
@@ -155,7 +155,7 @@
 
   function renderRow(slot, now) {
     const status = core.slotStatus(slot, state, now);
-    const statusText = { active: '<span class="live-dot"></span>СЕЙЧАС', open: 'Окончание<br>неизвестно', past: '<span class="status-check" aria-hidden="true">✓</span>Слот прошёл', upcoming: 'Впереди' }[status];
+    const statusText = { active: '<span class="live-dot"></span><span>СЕЙЧАС<br>ИГРА #' + slot.numberInDay + '</span>', open: 'Окончание<br>неизвестно', past: '<span class="status-check" aria-hidden="true">✓</span>Слот прошёл', upcoming: 'Впереди' }[status];
     const sub = [];
     const differentDate = localDate(slot.start) !== slot.dayId;
     const crossesMidnight = crossesLocalMidnight(slot);
