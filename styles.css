@@ -12,5 +12,118 @@
 .now-time .muted{color:#a8b398}
 @media(max-width:560px){.hero{overflow:hidden}.hero-art{margin:0;right:0;top:150px;transform:scale(.5);transform-origin:right top;width:220px;opacity:.85}.slot-status,.slot-subtime{font-size:9px}}
 @media(max-width:370px){.hero-art{right:0;top:150px;transform:scale(.43)}}
+.theme-toggle{display:grid;place-items:center;flex:0 0 40px;width:40px;height:40px;padding:0;border:1px solid var(--line);border-radius:3px;background:transparent;color:var(--ink);transition:background .15s,border-color .15s}
+.theme-toggle:hover{background:#e9eddf;border-color:#9aa78a}
+.theme-toggle svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle .theme-icon-sun{display:none}
+[data-theme="dark"] .theme-toggle .theme-icon-sun{display:block}
+[data-theme="dark"] .theme-toggle .theme-icon-moon{display:none}
+@media(max-width:760px){.header-right{gap:10px}.theme-toggle{width:36px;height:36px;flex-basis:36px}}
+@media(max-width:370px){.header-right{gap:7px}.theme-toggle{width:32px;height:32px;flex-basis:32px}.theme-toggle svg{width:16px;height:16px}}
+
+/* Screen-only palette: printed schedules keep their light background. */
+@media screen {
+  :root[data-theme="dark"] {
+    --paper:#141a12;
+    --ink:#e5eadf;
+    --muted:#a0ad94;
+    --line:#36412f;
+    --green:#bce667;
+    --white:#1d241b;
+    color-scheme:dark;
+  }
+
+  [data-theme="dark"] .skip-link{background:var(--lime);color:#20231f}
+  [data-theme="dark"] h1>span{color:#a1b685}
+  [data-theme="dark"] .hero-copy>.eyebrow,
+  [data-theme="dark"] .hero-description{color:#a7b29e}
+  [data-theme="dark"] .hero-art{background-image:radial-gradient(#46513d .85px,transparent .85px)}
+  [data-theme="dark"] .art-orbit{border-color:#46533c}
+  [data-theme="dark"] .orbit-two{border-color:#35432e}
+  [data-theme="dark"] .star-two{color:#a1b685}
+  [data-theme="dark"] .art-coordinate{color:#98a48b}
+  [data-theme="dark"] .cartridge{border-color:#657353;box-shadow:10px 12px 0 #00000040}
+  [data-theme="dark"] .cartridge-label,
+  [data-theme="dark"] .art-sticker{color:#20231f}
+
+  [data-theme="dark"] .now-card{background:#1d2b20;color:var(--ink);box-shadow:inset 0 0 0 1px #3b4e2e}
+  [data-theme="dark"] .now-card.is-unknown{background:#2e281c;box-shadow:inset 0 0 0 1px #665237}
+  [data-theme="dark"] .now-progress{background:#354333}
+  [data-theme="dark"] .next-card{background:#222820}
+  [data-theme="dark"] .next-game{color:var(--muted)}
+  [data-theme="dark"] .live-dot{background:var(--lime)}
+
+  [data-theme="dark"] .theme-toggle:hover,
+  [data-theme="dark"] .button-outline:hover{background:#2a3723;border-color:#728c57}
+  [data-theme="dark"] .button-outline{border-color:#49563f}
+  [data-theme="dark"] .button-dark{background:var(--lime);border-color:var(--lime);color:#20231f}
+  [data-theme="dark"] .button-dark:hover{background:#cbef85;border-color:#cbef85}
+  [data-theme="dark"] .day-tab:hover{background:#283223;border-color:#61734d}
+  [data-theme="dark"] .day-tab[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:#20231f}
+  [data-theme="dark"] .day-tab[aria-pressed="true"] .day-text small{color:#4d6237}
+  [data-theme="dark"] .day-tab .tab-live-dot{background:var(--lime)}
+  [data-theme="dark"] .day-tab[aria-pressed="true"] .tab-live-dot{background:#31583c}
+  [data-theme="dark"] .search-field,
+  [data-theme="dark"] .platform-field select{background:#181e17}
+  [data-theme="dark"] .platform-field select{color:var(--ink)}
+  [data-theme="dark"] .search-field svg{stroke:#99a58b}
+  [data-theme="dark"] .search-field input::placeholder{color:#94a087}
+  [data-theme="dark"] .search-hint{color:var(--muted)}
+
+  [data-theme="dark"] .schedule-table thead th{color:#a0ad94}
+  [data-theme="dark"] .schedule-table tbody td{background:#1d241b;border-color:#34402e}
+  [data-theme="dark"] .schedule-table tbody tr:hover td{background:#293323}
+  [data-theme="dark"] .slot-participant{color:#a8b59d}
+  [data-theme="dark"] .slot-participant .handle{color:#93a583}
+  [data-theme="dark"] .slot-subtime{color:#a0ad94}
+  [data-theme="dark"] .slot-date{color:#c7a676}
+  [data-theme="dark"] .slot-status{color:#a4b196}
+  [data-theme="dark"] .status-check{color:#a0b588}
+  [data-theme="dark"] .schedule-table tr.is-past td{background:#181e17}
+  [data-theme="dark"] .schedule-table tr.is-past .slot-game{color:#a6b39a}
+  [data-theme="dark"] .schedule-table tr.is-past .platform-badge{opacity:1}
+  [data-theme="dark"] .schedule-table tr.is-active td{background:#293d20;border-color:#526f39}
+  [data-theme="dark"] .schedule-table tr.is-active:hover td{background:#314929}
+  [data-theme="dark"] .schedule-table tr.is-active td:first-child{border-left-color:var(--lime)}
+  [data-theme="dark"] .is-active .slot-time,
+  [data-theme="dark"] .is-active .slot-participant{color:#d0eea6}
+  [data-theme="dark"] .is-active .slot-participant .handle{color:#a1bd7d}
+  [data-theme="dark"] .is-active .slot-status{color:#c1e783}
+  [data-theme="dark"] .schedule-table tr.is-open td{background:#352b1e;border-color:#6e5435}
+  [data-theme="dark"] .schedule-table tr.is-open:hover td{background:#40321f}
+  [data-theme="dark"] .schedule-table tr.is-open td:first-child{border-left-color:#e8b96f}
+  [data-theme="dark"] .is-open .slot-status,
+  [data-theme="dark"] .is-open .slot-participant{color:#edca92}
+  [data-theme="dark"] .is-open .slot-participant .handle{color:#c7a676}
+  [data-theme="dark"] .platform-badge{background:#2c3825;border-color:#475b38;color:#badc95}
+  [data-theme="dark"] .platform-badge[data-family="sega"]{background:#2d2b41;border-color:#484264;color:#c6bbee}
+  [data-theme="dark"] .platform-badge[data-family="arcade"]{background:#3b2e20;border-color:#624b30;color:#e6c293}
+  [data-theme="dark"] .platform-badge[data-family="pc"]{background:#21362f;border-color:#3d5c51;color:#a7d3c3}
+  [data-theme="dark"] .platform-badge[data-family="sony"]{background:#352836;border-color:#5b405c;color:#d6b3da}
+
+  [data-theme="dark"] .schedule-note,
+  [data-theme="dark"] .closing-note p,
+  [data-theme="dark"] .site-footer,
+  [data-theme="dark"] .footer-brand>span{color:#9ba88f}
+  [data-theme="dark"] .schedule-note>span{color:#a1b685}
+  [data-theme="dark"] .closing-icon{color:#93b16f}
+  [data-theme="dark"] .text-link{border-color:#667857}
+  [data-theme="dark"] .footer-brand,
+  [data-theme="dark"] .site-footer>a{color:#c3ceb6}
+  [data-theme="dark"] .source-notice{color:#e1b875}
+  [data-theme="dark"] .error-panel{background:#352b1e;border-color:#6e5435}
+  [data-theme="dark"] .noscript{background:#42351e;color:#eee1cb}
+
+  @media(max-width:560px) {
+    [data-theme="dark"] .platform-field select{background:transparent}
+    [data-theme="dark"] .schedule-table tbody tr{background:#1d241b;border-color:#34402e}
+    [data-theme="dark"] .schedule-table tbody tr.is-past{background:#181e17}
+    [data-theme="dark"] .schedule-table tbody tr:hover{background:#293323}
+    [data-theme="dark"] .schedule-table tbody tr.is-active{background:#293d20;border-color:#526f39;border-left-color:var(--lime)}
+    [data-theme="dark"] .schedule-table tbody tr.is-active:hover{background:#314929}
+    [data-theme="dark"] .schedule-table tbody tr.is-open{background:#352b1e;border-color:#6e5435;border-left-color:#e8b96f}
+    [data-theme="dark"] .schedule-table tbody tr.is-open:hover{background:#40321f}
+  }
+}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 @media print{body{background:white;font-size:11px}.wrap{width:100%}.site-header,.hero,.event-facts,.broadcast,.schedule-tools,.day-tabs,.section-heading>button,.closing-note,.site-footer,.schedule-note,.source-notice{display:none}.schedule-section{margin:0}.section-heading{margin-bottom:10px}.schedule-table tbody tr{break-inside:avoid}.schedule-table tbody td{background:white!important;padding:8px 12px}.schedule-table tr.is-active td{border-color:#555}.slot-game{font-size:11px}.slot-participant{font-size:10px}.schedule-table .status-col{width:100px}}
