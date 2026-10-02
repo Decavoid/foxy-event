@@ -28,7 +28,8 @@
     let rollover = 0;
     let previousStartMinutes = -1;
 
-    for (const [lineIndex, raw] of text.replace(/^\uFEFF/, '').split(/\r?\n/).entries()) {
+    // Editors can mix CRLF, LF, and standalone CR line endings in the same file.
+    for (const [lineIndex, raw] of text.replace(/^\uFEFF/, '').split(/\r\n?|\n/).entries()) {
       const line = raw.trim();
       if (!line || /^РАСПИСАНИЕ(?:\s|:|$)/iu.test(line) || line.startsWith('#')) continue;
       const heading = line.match(/^-+\s*(\d{1,2})\s+([а-яё]+)(?:\s+(\d{4}))?\s*-+$/iu);
