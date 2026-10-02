@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#191c19">
+  <meta name="description" content="Три дня любимых ретро-игр. Расписание стримерского марафона 2–4 октября 2026: участники, игры и текущий эфир. Всё время — UTC+3.">
+  <title>Ретро-марафон · 2–4 октября</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./schedule-data.js"></script>
+  <script defer src="./schedule-core.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#schedule">Перейти к расписанию</a>
+  <header class="site-header">
+    <div class="header-inner wrap">
+      <a class="brand" href="./" aria-label="Ретро-марафон — главная">
+        <svg class="brand-icon" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 5h16v4h4v15h-4v4h-6v-4h-4v4H8v-4H4V9h4V5Z" fill="currentColor"/><path d="M9 12h4v-3h3v3h4v3h-4v4h-3v-4H9v-3Z" fill="#f4f3ed"/><path d="M22 17h3v3h-3z" fill="#bce667"/></svg>
+        <span>РЕТРО<span class="brand-slash"> / </span>МАРАФОН</span>
+      </a>
+      <div class="header-right">
+        <span class="header-date">02—04 ОКТЯБРЯ <span class="muted">2026</span></span>
+        <div class="event-clock"><span class="clock-dot"></span><time id="clock">--:--:--</time><span>UTC+3</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tiny-cross">✦</span> СТРИМЕРСКИЙ ИВЕНТ · TWITCH / YOUTUBE</p>
+        <h1 id="hero-title">Старые игры.<br><span>Новая встреча.</span></h1>
+        <p class="hero-description">Три дня, любимые консоли и люди по ту сторону экрана.<br class="desktop-break"> Выбирай игру, находи своего стримера и присоединяйся.</p>
+        <a class="hero-link" href="#schedule">Смотреть расписание <span aria-hidden="true">↘</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        <span class="art-star star-one">✦</span><span class="art-star star-two">+</span>
+        <div class="cartridge">
+          <div class="cartridge-top"><span></span><span></span><span></span></div>
+          <div class="cartridge-label">
+            <span class="cartridge-caption">RETRO MARATHON</span>
+            <div class="pixel-invader"><svg viewBox="0 0 88 64" fill="currentColor"><path d="M16 0h8v8h-8zM64 0h8v8h-8zM24 8h8v8h-8zM56 8h8v8h-8zM16 16h56v8H16zM8 24h16v8H8zM32 24h24v8H32zM64 24h16v8H64zM0 32h88v8H0zM0 40h8v16H0zM16 40h56v8H16zM80 40h8v16h-8zM16 48h8v8h-8zM64 48h8v8h-8zM24 56h16v8H24zM48 56h16v8H48z"/></svg></div>
+            <span class="cartridge-insert">INSERT GOOD TIMES</span>
+          </div>
+          <div class="cartridge-bottom"><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="art-sticker">100%<br><span>НОСТАЛЬГИЯ</span></div>
+        <span class="art-coordinate">PLAYER 01 — READY</span>
+      </div>
+    </section>
+
+    <div class="event-facts" aria-label="Об ивенте">
+      <span><strong>03</strong> дня марафона</span><span><strong id="slot-count">48</strong> игровых слотов</span><span><strong id="platform-count">12</strong> платформ</span>
+      <span class="facts-time"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>Всё время — UTC+3</span>
+    </div>
+
+    <section id="broadcast" class="broadcast" aria-label="Текущий и следующий слот">
+      <div class="now-card is-loading"><p class="eyebrow">ЗАГРУЖАЕМ РАСПИСАНИЕ</p><h2>Готовим следующий уровень…</h2></div>
+    </section>
+    <p id="source-notice" class="source-notice" role="status" hidden></p>
+    <p id="slot-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+
+    <section id="schedule" class="schedule-section" aria-labelledby="schedule-title">
+      <div class="section-heading"><div><p class="eyebrow">ВЫБИРАЙ СВОЙ УРОВЕНЬ</p><h2 id="schedule-title">Расписание</h2></div><button id="jump-current" class="button button-outline" type="button"><span class="live-dot"></span><span id="jump-label">К текущему слоту</span><span aria-hidden="true">↗</span></button></div>
+      <div id="day-tabs" class="day-tabs" role="group" aria-label="День марафона"></div>
+      <div class="schedule-tools">
+        <div class="search-field"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><label class="sr-only" for="search">Найти игру или участника</label><input id="search" type="search" placeholder="Найти игру или участника…" autocomplete="off"><span class="search-hint" aria-hidden="true">/</span></div>
+        <div class="platform-field"><label class="sr-only" for="platform">Платформа</label><select id="platform"><option value="all">Все платформы</option></select><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></div>
+        <span id="result-count" class="result-count" role="status"></span>
+      </div>
+      <div id="schedule-content" class="schedule-content" aria-busy="true"></div>
+      <div id="empty-state" class="empty-state" hidden><span aria-hidden="true">⌕</span><h3>Ничего не нашлось</h3><p>Попробуй другую игру, участника или платформу.</p><button id="reset-filters" class="button button-dark" type="button">Сбросить фильтры</button></div>
+      <p class="schedule-note"><span aria-hidden="true">↳</span> Ночные слоты остаются в программе предыдущего дня. У них указана фактическая дата.</p>
+    </section>
+
+    <aside class="closing-note"><span class="closing-icon" aria-hidden="true">✳</span><div><h2>Сохраняй расписание. Возвращайся за ностальгией.</h2><p>Текущий слот подсвечивается автоматически. Время указано по расписанию и может отличаться от фактического эфира.</p></div><a class="text-link" href="./Schedule.txt" download>Расписание .txt <span aria-hidden="true">↗</span></a></aside>
+  </main>
+  <footer class="site-footer wrap"><span class="footer-brand">РЕТРО / МАРАФОН <span>© 2026</span></span><span>Играем вместе. Как раньше.</span><a href="#hero-title">Наверх ↑</a></footer>
+  <noscript><div class="noscript">Для автоматической подсветки включите JavaScript. <a href="./Schedule.txt">Открыть полное расписание</a>.</div></noscript>
+</body>
+</html>
