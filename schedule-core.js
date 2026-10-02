@@ -27,6 +27,8 @@
     let day = null;
     let rollover = 0;
     let previousStartMinutes = -1;
+    let previousEntryStart = null;
+    let pendingSlot = null;
 
     // Editors can mix CRLF, LF, and standalone CR line endings in the same file.
     for (const [lineIndex, raw] of text.replace(/^\uFEFF/, '').split(/\r\n?|\n/).entries()) {
@@ -47,31 +49,47 @@
         previousStartMinutes = -1;
         continue;
       }
+      const entry = line.match(/^(\d{1,2}:\d{2})\s*[-–—]\s*(.+)$/u);
+      if (!entry || !day) throw new Error('Не удалось разобрать строку ' + (lineIndex + 1) + ': ' + line);
+      const details = entry[2].trim();
+      const isBoundary = /^(?:Перерыв|Конец)$/iu.test(details);
       // Preserve parentheses in names, ampersands, and the extra slash in Jurassic Park / (SNES).
-      const match = line.match(/^(\d{1,2}:\d{2})\s*[-–—]\s*(?:(\d{1,2}:\d{2})\s+)?(.+?)\s*\/\s*(.+?)\s*\(([^()]*)\)\s*$/u);
-      if (!match || !day) throw new Error('Не удалось разобрать строку ' + (lineIndex + 1) + ': ' + line);
-      const startMinutes = minutes(match[1]);
-      const endMinutes = match[2] ? minutes(match[2]) : null;
+      const match = details.match(/^(.+?)\s*\/\s*(.+?)\s*\(([^()]*)\)\s*$/u);
+      if (!isBoundary && (!match || /^\d{1,2}:\d{2}(?:\s|$)/u.test(details))) {
+        throw new Error('Не удалось разобрать строку ' + (lineIndex + 1) + ': ' + line);
+      }
+      const startMinutes = minutes(entry[1]);
       if (startMinutes < previousStartMinutes) rollover += 1;
       previousStartMinutes = startMinutes;
       const start = day.date + rollover * DAY_MS + startMinutes * 60000 - OFFSET_MS;
-      const end = endMinutes === null ? null : day.date + (rollover + (endMinutes <= startMinutes ? 1 : 0)) * DAY_MS + endMinutes * 60000 - OFFSET_MS;
-      const [platform, ...tags] = match[5].split(',').map(value => value.trim());
-      const game = match[4].replace(/\s*\/\s*$/, '').trim();
+      const startLabel = entry[1].padStart(5, '0');
+      if (previousEntryStart !== null && start <= previousEntryStart) throw new Error('Слоты должны идти по порядку времени: ' + line);
+      if (isBoundary && (!pendingSlot || pendingSlot.dayId !== day.id)) throw new Error('Не указан слот перед перерывом или концом в строке ' + (lineIndex + 1));
+      // The next start closes the preceding slot, including across midnight or a day heading.
+      if (pendingSlot) {
+        pendingSlot.end = start;
+        pendingSlot.endLabel = startLabel;
+        pendingSlot.endDate = eventDate(start);
+        pendingSlot.duration = (start - pendingSlot.start) / 60000;
+      }
+      previousEntryStart = start;
+      pendingSlot = null;
+      // Break/end markers preserve offline periods without adding rows to the displayed schedule.
+      if (isBoundary) continue;
+      const [platform, ...tags] = match[3].split(',').map(value => value.trim());
+      const game = match[2].replace(/\s*\/\s*$/, '').trim();
       const slot = {
-        id: 'slot-' + (slots.length + 1), dayId: day.id, start, end,
-        startLabel: match[1].padStart(5, '0'), endLabel: match[2] ? match[2].padStart(5, '0') : null,
-        participant: match[3].trim(), game, platform, tags,
-        actualDate: eventDate(start), endDate: end === null ? null : eventDate(end),
-        overnight: rollover > 0, duration: end === null ? null : (end - start) / 60000,
-        searchText: normalize([match[3], game, platform, ...tags].join(' '))
+        id: 'slot-' + (slots.length + 1), dayId: day.id, start, end: null,
+        startLabel, endLabel: null,
+        participant: match[1].trim(), game, platform, tags,
+        actualDate: eventDate(start), endDate: null,
+        overnight: rollover > 0, duration: null,
+        searchText: normalize([match[1], game, platform, ...tags].join(' '))
       };
       if (!game || !platform) throw new Error('Не указана игра или платформа в строке ' + (lineIndex + 1));
-      const previous = slots[slots.length - 1];
-      if (previous && start <= previous.start) throw new Error('Слоты должны идти по порядку времени: ' + line);
-      if (previous && previous.end !== null && start < previous.end) throw new Error('Пересекаются слоты: ' + line);
       day.slots.push(slot);
       slots.push(slot);
+      pendingSlot = slot;
     }
     if (!slots.length || days.some(item => !item.slots.length)) throw new Error('Расписание не содержит слотов или содержит пустой день.');
     return { days, slots, platforms: [...new Set(slots.map(slot => slot.platform))].sort((a, b) => a.localeCompare(b)) };
