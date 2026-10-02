@@ -31,6 +31,48 @@
 @media(max-width:760px){.header-right{gap:10px}.theme-toggle{width:36px;height:36px;flex-basis:36px}}
 @media(max-width:370px){.header-right{gap:7px}.theme-toggle{width:32px;height:32px;flex-basis:32px}.theme-toggle svg{width:16px;height:16px}}
 
+/* Keep small interface labels readable at every screen width. */
+@media screen {
+  .platform-badge,
+  .now-game .inline-platform {font-size:12px}
+
+  .platform-tag,
+  .slot-subtime,
+  .slot-status,
+  .schedule-table thead th,
+  .day-text small,
+  .day-group-title span,
+  .result-count,
+  .now-bottom,
+  .next-countdown,
+  .next-time,
+  .next-footer .next-time {font-size:11px}
+
+  .hero-copy>.eyebrow,
+  .now-card .eyebrow,
+  .next-heading .eyebrow,
+  .section-heading .eyebrow {font-size:11px}
+
+  .button,
+  .section-heading .button,
+  .day-text,
+  .all-days-tab,
+  .search-field input,
+  .platform-field select {font-size:12px}
+
+  .schedule-note,
+  .closing-note p,
+  .text-link,
+  .closing-note .text-link,
+  .site-footer,
+  .footer-brand {font-size:11px}
+
+  @media(max-width:560px) {
+    .day-tab:not(.all-days-tab){flex-direction:column;gap:6px;padding-inline:6px;text-align:center}
+    .section-heading,.now-bottom,.next-heading{flex-wrap:wrap}
+  }
+}
+
 /* Screen-only palette: printed schedules keep their light background. */
 @media screen {
   :root[data-theme="dark"] {
