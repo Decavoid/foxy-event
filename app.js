@@ -4,10 +4,12 @@
   const core = window.ScheduleCore;
   const config = window.RETRO_SCHEDULE;
   const $ = id => document.getElementById(id);
-  const clockFormat = new Intl.DateTimeFormat('ru-RU', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+  const clockFormat = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+  const timeFormat = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  const dateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' });
+  const shortDateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
+  // Programme headings are calendar dates, not instants to convert to local time.
   const weekdayFormat = new Intl.DateTimeFormat('ru-RU', { timeZone: 'UTC', weekday: 'long' });
-  const dateFormat = new Intl.DateTimeFormat('ru-RU', { timeZone: 'UTC', day: 'numeric', month: 'long' });
-  const shortDateFormat = new Intl.DateTimeFormat('ru-RU', { timeZone: 'UTC', day: 'numeric', month: 'short' });
   let schedule = null;
   let selectedDay = null;
   let manualDay = false;
@@ -60,15 +62,34 @@
   }
 
   function dateLabel(timestamp, short) {
-    return (short ? shortDateFormat : dateFormat).format(timestamp + core.OFFSET_MS);
+    return (short ? shortDateFormat : dateFormat).format(timestamp);
+  }
+
+  function localDate(timestamp) {
+    const date = new Date(timestamp);
+    return [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
+  }
+
+  function timezoneLabel(timestamp) {
+    const offset = -new Date(timestamp).getTimezoneOffset();
+    const minutes = Math.abs(offset) % 60;
+    return 'UTC' + (offset === 0 ? '' : (offset > 0 ? '+' : '−') + Math.floor(Math.abs(offset) / 60) + (minutes ? ':' + String(minutes).padStart(2, '0') : ''));
+  }
+
+  function crossesLocalMidnight(slot) {
+    return slot.end !== null && localDate(slot.start) !== localDate(slot.end);
+  }
+
+  function slotDateLabel(slot) {
+    return dateLabel(slot.start, true) + (crossesLocalMidnight(slot) ? ' — ' + dateLabel(slot.end, true) : '');
   }
 
   function timeRange(slot) {
-    return slot.startLabel + ' — ' + (slot.endLabel || '?');
+    return timeFormat.format(slot.start) + ' — ' + (slot.end === null ? '?' : timeFormat.format(slot.end));
   }
 
   function slotTimeMarkup(slot) {
-    return '<time datetime="' + new Date(slot.start).toISOString() + '">' + escape(slot.startLabel) + '</time> — ' + (slot.end === null ? '<span aria-label="Время окончания неизвестно">?</span>' : '<time datetime="' + new Date(slot.end).toISOString() + '">' + escape(slot.endLabel) + '</time>');
+    return '<time datetime="' + new Date(slot.start).toISOString() + '">' + escape(timeFormat.format(slot.start)) + '</time> — ' + (slot.end === null ? '<span aria-label="Время окончания неизвестно">?</span>' : '<time datetime="' + new Date(slot.end).toISOString() + '">' + escape(timeFormat.format(slot.end)) + '</time>');
   }
 
   function pluralSlots(count) {
@@ -97,7 +118,7 @@
     $('stream-description').textContent = state.current
       ? 'Присоединяйся к трансляции FoxyShadow.'
       : state.next
-        ? 'Следующий эфир — ' + dateLabel(state.next.start) + ' в ' + state.next.startLabel + ' (UTC+3).'
+        ? 'Следующий эфир — ' + dateLabel(state.next.start) + ' в ' + timeFormat.format(state.next.start) + ' по вашему времени.'
         : state.open
           ? 'Время окончания последнего слота не указано.'
           : 'Марафон завершён. Спасибо всем, кто был с нами!';
@@ -112,16 +133,16 @@
     let nowCard;
     const decoration = '<svg class="now-decoration" viewBox="0 0 88 64" fill="currentColor" aria-hidden="true"><path d="M16 0h8v8h-8zM64 0h8v8h-8zM24 8h8v8h-8zM56 8h8v8h-8zM16 16h56v8H16zM8 24h16v8H8zM32 24h24v8H32zM64 24h16v8H64zM0 32h88v8H0zM0 40h8v16H0zM16 40h56v8H16zM80 40h8v16h-8zM16 48h8v8h-8zM64 48h8v8h-8zM24 56h16v8H24zM48 56h16v8H48z"/></svg>';
     if (current) {
-      nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span>' + (isUnknown ? 'ПОСЛЕДНИЙ ЗАПЛАНИРОВАННЫЙ СЛОТ' : 'СЕЙЧАС ПО РАСПИСАНИЮ') + '</p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(dateLabel(current.start, true)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущего слота" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
+      nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span>' + (isUnknown ? 'ПОСЛЕДНИЙ ЗАПЛАНИРОВАННЫЙ СЛОТ' : 'СЕЙЧАС ПО РАСПИСАНИЮ') + '</p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(slotDateLabel(current)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущего слота" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
     } else {
       const titles = { before: 'Скоро нажмём START.', break: 'Эфир завершён.', finished: 'Спасибо за игру!' };
-      const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + state.next.startLabel : '') + '. Выбирай, что посмотреть.', break: 'Сейчас перерыв. Вернёмся к началу следующего слота.', finished: 'Все слоты по расписанию завершены. Любимые игры и участники остаются здесь.' };
-      nowCard = '<article class="now-card is-idle"><p class="eyebrow">' + ({ before: 'ДО НАЧАЛА МАРАФОНА', break: 'МЕЖДУ ЭФИРАМИ', finished: 'ИВЕНТ ЗАВЕРШЁН' }[state.phase]) + '</p><h2>' + titles[state.phase] + '</h2><p class="now-game">' + escape(copy[state.phase]) + '</p><div class="now-bottom"><span id="now-remaining"></span><span>UTC+3</span></div></article>';
+      const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + timeFormat.format(state.next.start) : '') + '. Выбирай, что посмотреть.', break: 'Сейчас перерыв. Вернёмся к началу следующего слота.', finished: 'Все слоты по расписанию завершены. Любимые игры и участники остаются здесь.' };
+      nowCard = '<article class="now-card is-idle"><p class="eyebrow">' + ({ before: 'ДО НАЧАЛА МАРАФОНА', break: 'МЕЖДУ ЭФИРАМИ', finished: 'ИВЕНТ ЗАВЕРШЁН' }[state.phase]) + '</p><h2>' + titles[state.phase] + '</h2><p class="now-game">' + escape(copy[state.phase]) + '</p><div class="now-bottom"><span id="now-remaining"></span><span>Местное время</span></div></article>';
     }
     let nextCard;
     if (state.next) {
       const next = state.next;
-      nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">СЛЕДУЮЩИЙ УРОВЕНЬ</p><span id="next-countdown" class="next-countdown"></span></div><h3>' + prettyParticipant(next.participant) + '</h3><p class="next-game">' + escape(next.game) + '</p><div class="next-footer"><span class="next-time">' + escape(timeRange(next)) + (core.eventDate(next.start) !== core.eventDate(Date.now()) ? '<br>' + escape(dateLabel(next.start, true)) : '') + '</span><span>' + badge(next) + '</span><span class="next-arrow" aria-hidden="true">↗</span></div></article>';
+      nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">СЛЕДУЮЩИЙ УРОВЕНЬ</p><span id="next-countdown" class="next-countdown"></span></div><h3>' + prettyParticipant(next.participant) + '</h3><p class="next-game">' + escape(next.game) + '</p><div class="next-footer"><span class="next-time">' + escape(timeRange(next)) + (localDate(next.start) !== localDate(Date.now()) || crossesLocalMidnight(next) ? '<br>' + escape(slotDateLabel(next)) : '') + '</span><span>' + badge(next) + '</span><span class="next-arrow" aria-hidden="true">↗</span></div></article>';
     } else {
       nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">ФИНАЛЬНЫЙ УРОВЕНЬ</p><span aria-hidden="true">✦</span></div><h3>Вот это марафон.</h3><p class="next-game">' + (isUnknown ? 'Это последний слот программы. Время его завершения не указано.' : 'Впереди нет запланированных слотов. Спасибо всем, кто был с нами!') + '</p><div class="next-footer"><span class="next-time">' + pluralSlots(schedule.slots.length) + ' · ' + schedule.days.length + ' дня</span><span class="next-arrow" aria-hidden="true">♡</span></div></article>';
     }
@@ -136,11 +157,13 @@
     const status = core.slotStatus(slot, state, now);
     const statusText = { active: '<span class="live-dot"></span>СЕЙЧАС', open: 'Окончание<br>неизвестно', past: '<span class="status-check" aria-hidden="true">✓</span>Слот прошёл', upcoming: 'Впереди' }[status];
     const sub = [];
-    if (slot.overnight) sub.push(dateLabel(slot.start, true));
-    if (!slot.overnight && slot.endDate && slot.endDate !== slot.actualDate) sub.push('до ' + dateLabel(slot.end, true));
+    const differentDate = localDate(slot.start) !== slot.dayId;
+    const crossesMidnight = crossesLocalMidnight(slot);
+    if (differentDate) sub.push(dateLabel(slot.start, true));
+    if (crossesMidnight) sub.push('до ' + dateLabel(slot.end, true));
     if (slot.duration !== null) sub.push(duration(slot.duration));
     else if (status !== 'open') sub.push('конец не указан');
-    return '<tr id="' + slot.id + '" class="is-' + status + '" tabindex="-1"' + (status === 'active' ? ' aria-current="true"' : '') + '><td><span class="slot-time">' + slotTimeMarkup(slot) + '</span><span class="slot-subtime ' + (slot.overnight ? 'slot-date' : '') + '">' + escape(sub.join(' · ')) + '</span></td><td><div class="slot-game">' + escape(slot.game) + '</div><span class="slot-participant">' + participant(slot.participant) + '</span></td><td>' + badge(slot) + '</td><td><span class="slot-status">' + statusText + '</span></td></tr>';
+    return '<tr id="' + slot.id + '" class="is-' + status + '" tabindex="-1"' + (status === 'active' ? ' aria-current="true"' : '') + '><td><span class="slot-time">' + slotTimeMarkup(slot) + '</span><span class="slot-subtime ' + (differentDate || crossesMidnight ? 'slot-date' : '') + '">' + escape(sub.join(' · ')) + '</span></td><td><div class="slot-game">' + escape(slot.game) + '</div><span class="slot-participant">' + participant(slot.participant) + '</span></td><td>' + badge(slot) + '</td><td><span class="slot-status">' + statusText + '</span></td></tr>';
   }
 
   function renderSchedule() {
@@ -155,7 +178,7 @@
       count += visible.length;
       if (!visible.length) return '';
       const dayTitle = day.number + ' ' + day.month;
-      return '<div class="day-group">' + (selectedDay === 'all' ? '<h3 class="day-group-title">' + escape(dayTitle) + '<span>' + escape(weekdayFormat.format(day.date)) + '</span></h3>' : '') + '<table class="schedule-table"><caption class="sr-only">Расписание на ' + escape(dayTitle) + '. Время UTC+3.</caption><colgroup><col class="time-col"><col><col class="platform-col"><col class="status-col"></colgroup><thead><tr><th scope="col">Время · UTC+3</th><th scope="col">Игра / участник</th><th scope="col">Платформа</th><th scope="col">Статус</th></tr></thead><tbody>' + visible.map(slot => renderRow(slot, now)).join('') + '</tbody></table></div>';
+      return '<div class="day-group">' + (selectedDay === 'all' ? '<h3 class="day-group-title">' + escape(dayTitle) + '<span>' + escape(weekdayFormat.format(day.date)) + '</span></h3>' : '') + '<table class="schedule-table"><caption class="sr-only">Программа на ' + escape(dayTitle) + '. Время в вашем часовом поясе.</caption><colgroup><col class="time-col"><col><col class="platform-col"><col class="status-col"></colgroup><thead><tr><th scope="col">Время · местное</th><th scope="col">Игра / участник</th><th scope="col">Платформа</th><th scope="col">Статус</th></tr></thead><tbody>' + visible.map(slot => renderRow(slot, now)).join('') + '</tbody></table></div>';
     }).join('');
     $('schedule-content').innerHTML = content;
     $('schedule-content').setAttribute('aria-busy', 'false');
@@ -165,11 +188,13 @@
 
   function tick() {
     const now = Date.now();
-    $('clock').textContent = clockFormat.format(now + core.OFFSET_MS);
+    $('clock').textContent = clockFormat.format(now);
     $('clock').dateTime = new Date(now).toISOString();
+    $('clock-zone').textContent = timezoneLabel(now);
+    $('clock-zone').title = 'Ваше местное время · ' + clockFormat.resolvedOptions().timeZone;
     if (!schedule) return;
     state = core.getState(schedule, now);
-    const newSignature = [state.phase, state.current?.id, state.open?.id, state.next?.id, core.eventDate(now)].join('|');
+    const newSignature = [state.phase, state.current?.id, state.open?.id, state.next?.id, localDate(now)].join('|');
     if (signature !== newSignature) {
       signature = newSignature;
       if (!manualDay && state.focus) selectedDay = state.focus.dayId;
