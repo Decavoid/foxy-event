@@ -52,6 +52,13 @@
     return duration(totalMinutes);
   }
 
+  function countdownClock(milliseconds) {
+    const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
+    const days = Math.floor(seconds / 86400);
+    const time = [Math.floor(seconds / 3600) % 24, Math.floor(seconds / 60) % 60, seconds % 60];
+    return (days ? days + ' д ' : '') + time.map(value => String(value).padStart(2, '0')).join(':');
+  }
+
   function dateLabel(timestamp, short) {
     return (short ? shortDateFormat : dateFormat).format(timestamp + core.OFFSET_MS);
   }
@@ -77,7 +84,29 @@
     }).join('') + '<button class="day-tab all-days-tab" type="button" data-day="all" aria-controls="schedule-content" aria-pressed="' + (selectedDay === 'all') + '">Все дни <span aria-hidden="true">↗</span></button>';
   }
 
+  function renderStreamBanner() {
+    const titles = {
+      active: 'Марафон в прямом эфире',
+      before: 'Сейчас не в эфире',
+      break: 'Трансляция завершена',
+      finished: 'Трансляция завершена',
+      unknown: 'Статус эфира неизвестен'
+    };
+    $('stream-banner').dataset.state = state.phase;
+    $('stream-status').textContent = titles[state.phase];
+    $('stream-description').textContent = state.current
+      ? 'Присоединяйся к трансляции FoxyShadow.'
+      : state.next
+        ? 'Следующий эфир — ' + dateLabel(state.next.start) + ' в ' + state.next.startLabel + ' (UTC+3).'
+        : state.open
+          ? 'Время окончания последнего слота не указано.'
+          : 'Марафон завершён. Спасибо всем, кто был с нами!';
+    $('stream-countdown').hidden = !!state.current || !state.next;
+    $('stream-countdown').textContent = '';
+  }
+
   function renderBroadcast() {
+    renderStreamBanner();
     const current = state.current || state.open;
     const isUnknown = state.phase === 'unknown';
     let nowCard;
@@ -85,8 +114,8 @@
     if (current) {
       nowCard = '<article class="now-card ' + (isUnknown ? 'is-unknown' : 'is-live') + '"><p class="eyebrow"><span class="live-dot"></span>' + (isUnknown ? 'ПОСЛЕДНИЙ ЗАПЛАНИРОВАННЫЙ СЛОТ' : 'СЕЙЧАС ПО РАСПИСАНИЮ') + '</p><h2>' + prettyParticipant(current.participant) + '</h2><p class="now-game">' + escape(current.game) + '<span class="inline-platform">' + escape(current.platform) + '</span></p>' + decoration + '<div class="now-bottom"><span class="now-time">' + slotTimeMarkup(current) + ' <span class="muted">· ' + escape(dateLabel(current.start, true)) + '</span></span><span id="now-remaining">' + (isUnknown ? 'Окончание неизвестно' : '') + '</span></div>' + (isUnknown ? '' : '<div class="now-progress" role="progressbar" aria-label="Время текущего слота" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="now-progress"></span></div>') + '</article>';
     } else {
-      const titles = { before: 'Скоро нажмём START.', break: 'Пауза между уровнями.', finished: 'Спасибо за игру!' };
-      const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + state.next.startLabel : '') + '. Выбирай, что посмотреть.', break: 'Сейчас в расписании перерыв. Следующий участник уже на подходе.', finished: 'Все слоты по расписанию завершены. Любимые игры и участники остаются здесь.' };
+      const titles = { before: 'Скоро нажмём START.', break: 'Эфир завершён.', finished: 'Спасибо за игру!' };
+      const copy = { before: 'Марафон начнётся ' + (state.next ? dateLabel(state.next.start) + ' в ' + state.next.startLabel : '') + '. Выбирай, что посмотреть.', break: 'Сейчас перерыв. Вернёмся к началу следующего слота.', finished: 'Все слоты по расписанию завершены. Любимые игры и участники остаются здесь.' };
       nowCard = '<article class="now-card is-idle"><p class="eyebrow">' + ({ before: 'ДО НАЧАЛА МАРАФОНА', break: 'МЕЖДУ ЭФИРАМИ', finished: 'ИВЕНТ ЗАВЕРШЁН' }[state.phase]) + '</p><h2>' + titles[state.phase] + '</h2><p class="now-game">' + escape(copy[state.phase]) + '</p><div class="now-bottom"><span id="now-remaining"></span><span>UTC+3</span></div></article>';
     }
     let nextCard;
@@ -97,8 +126,9 @@
       nextCard = '<article class="next-card"><div class="next-heading"><p class="eyebrow">ФИНАЛЬНЫЙ УРОВЕНЬ</p><span aria-hidden="true">✦</span></div><h3>Вот это марафон.</h3><p class="next-game">' + (isUnknown ? 'Это последний слот программы. Время его завершения не указано.' : 'Впереди нет запланированных слотов. Спасибо всем, кто был с нами!') + '</p><div class="next-footer"><span class="next-time">' + pluralSlots(schedule.slots.length) + ' · ' + schedule.days.length + ' дня</span><span class="next-arrow" aria-hidden="true">♡</span></div></article>';
     }
     $('broadcast').innerHTML = nowCard + nextCard;
-    $('slot-announcement').textContent = state.current ? 'Сейчас по расписанию: ' + state.current.participant + ', ' + state.current.game : state.open ? 'Последний запланированный слот: ' + state.open.participant + '. Время окончания неизвестно.' : 'Сейчас нет активного слота.';
+    $('slot-announcement').textContent = state.current ? 'Сейчас по расписанию: ' + state.current.participant + ', ' + state.current.game : state.open ? 'Последний запланированный слот: ' + state.open.participant + '. Время окончания неизвестно.' : $('stream-status').textContent + '. ' + $('stream-description').textContent;
     $('jump-label').textContent = state.current ? 'К текущему слоту' : state.open ? 'К последнему слоту' : state.next ? 'К следующему слоту' : 'К последнему слоту';
+    $('jump-live-dot').hidden = !state.current;
     $('jump-current').disabled = !state.focus;
   }
 
@@ -152,8 +182,10 @@
       $('now-remaining').textContent = 'До конца слота ' + countdown(state.current.end - now);
       $('now-progress').style.width = progress.toFixed(2) + '%';
       $('now-progress').parentElement.setAttribute('aria-valuenow', String(Math.floor(progress)));
-    } else if (state.phase === 'before' || state.phase === 'break') {
-      $('now-remaining').textContent = 'До начала ' + countdown(state.next.start - now);
+    } else if (state.next) {
+      const remaining = 'До начала эфира: ' + countdownClock(state.next.start - now);
+      $('stream-countdown').textContent = remaining;
+      if (state.phase !== 'unknown') $('now-remaining').textContent = remaining;
     }
     if (state.next) $('next-countdown').textContent = 'через ' + countdown(state.next.start - now);
   }
@@ -206,6 +238,8 @@
       if (schedule) {
         showNotice('Не удалось обновить Schedule.txt. Показана сохранённая версия; повторим попытку через минуту.');
       } else {
+        $('stream-status').textContent = 'Статус эфира недоступен';
+        $('stream-description').textContent = 'Не удалось загрузить расписание. Попробуй обновить страницу.';
         $('broadcast').innerHTML = '<div class="error-panel"><h3>Не удалось загрузить расписание</h3><p>Проверьте файл Schedule.txt и обновите страницу.</p><a href="./Schedule.txt">Открыть текстовое расписание ↗</a></div>';
         $('schedule-content').setAttribute('aria-busy', 'false');
         $('jump-current').disabled = true;

@@ -62,10 +62,11 @@
       <span class="facts-time"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 6v4l3 2"/></svg>Всё время — UTC+3</span>
     </div>
 
-    <section class="stream-banner" aria-labelledby="stream-title">
+    <section id="stream-banner" class="stream-banner" aria-labelledby="stream-title">
       <div class="stream-copy">
-        <h2 id="stream-title"><span class="live-dot" aria-hidden="true"></span>Марафон в прямом эфире</h2>
-        <p>Присоединяйся к трансляции FoxyShadow.</p>
+        <h2 id="stream-title"><span class="stream-dot" aria-hidden="true"></span><span id="stream-status">Трансляция FoxyShadow</span></h2>
+        <p id="stream-description">Статус эфира — по расписанию марафона.</p>
+        <p id="stream-countdown" class="stream-countdown" hidden></p>
       </div>
       <div class="stream-links">
         <a class="button button-outline" href="https://www.youtube.com/FoxyShadow" target="_blank" rel="noopener noreferrer">Смотреть на YouTube <span aria-hidden="true">↗</span><span class="sr-only"> (откроется в новой вкладке)</span></a>
@@ -80,7 +81,7 @@
     <p id="slot-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p>
 
     <section id="schedule" class="schedule-section" aria-labelledby="schedule-title">
-      <div class="section-heading"><div><p class="eyebrow">ВЫБИРАЙ СВОЙ УРОВЕНЬ</p><h2 id="schedule-title">Расписание</h2></div><button id="jump-current" class="button button-outline" type="button"><span class="live-dot"></span><span id="jump-label">К текущему слоту</span><span aria-hidden="true">↗</span></button></div>
+      <div class="section-heading"><div><p class="eyebrow">ВЫБИРАЙ СВОЙ УРОВЕНЬ</p><h2 id="schedule-title">Расписание</h2></div><button id="jump-current" class="button button-outline" type="button"><span id="jump-live-dot" class="live-dot" aria-hidden="true" hidden></span><span id="jump-label">К текущему слоту</span><span aria-hidden="true">↗</span></button></div>
       <div id="day-tabs" class="day-tabs" role="group" aria-label="День марафона"></div>
       <div class="schedule-tools">
         <div class="search-field"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4 4"/></svg><label class="sr-only" for="search">Найти игру или участника</label><input id="search" type="search" placeholder="Найти игру или участника…" autocomplete="off"><span class="search-hint" aria-hidden="true">/</span></div>

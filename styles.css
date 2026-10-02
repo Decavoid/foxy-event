@@ -12,6 +12,9 @@
 .stream-banner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;margin-top:24px;padding:20px 24px;border:1px solid var(--line);border-radius:4px;background:var(--white)}
 .stream-copy h2{display:flex;align-items:center;gap:10px;font-size:18px;line-height:1.4}
 .stream-copy p{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.6}
+.stream-copy .stream-countdown{font:600 13px/1.6 var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.stream-dot{display:inline-block;flex:none;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.stream-banner[data-state="active"] .stream-dot{background:var(--green);box-shadow:0 0 0 3px #bce66720}
 .stream-links{display:flex;flex-wrap:wrap;gap:10px;max-width:100%}
 .stream-links .button{flex:1 1 auto;min-height:44px}
 @media(max-width:560px){.stream-banner{padding:18px}.stream-links{width:100%}}
