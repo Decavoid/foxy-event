@@ -93,7 +93,9 @@
       pendingSlot = slot;
     }
     if (!slots.length || days.some(item => !item.slots.length)) throw new Error('Расписание не содержит игр или содержит пустой день.');
-    return { days, slots, platforms: [...new Set(slots.map(slot => slot.platform))].sort((a, b) => a.localeCompare(b)) };
+    const players = slots.flatMap(slot => slot.participant.split('&'));
+    const participantCount = new Set(players.map(name => name.trim().toLocaleLowerCase('ru')).filter(Boolean)).size;
+    return { days, slots, participantCount, platforms: [...new Set(slots.map(slot => slot.platform))].sort((a, b) => a.localeCompare(b)) };
   }
 
   function normalize(value) {

@@ -8,6 +8,7 @@
   const timeFormat = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
   const dateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' });
   const shortDateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short' });
+  const participantPlural = new Intl.PluralRules('ru-RU');
   // Programme headings are calendar dates, not instants to convert to local time.
   const weekdayFormat = new Intl.DateTimeFormat('ru-RU', { timeZone: 'UTC', weekday: 'long' });
   let schedule = null;
@@ -229,6 +230,8 @@
     $('platform').innerHTML = '<option value="all">Все платформы</option>' + schedule.platforms.map(platform => '<option value="' + escape(platform) + '">' + escape(platform) + '</option>').join('');
     if (schedule.platforms.includes(oldPlatform)) $('platform').value = oldPlatform;
     $('slot-count').textContent = String(schedule.slots.length).padStart(2, '0');
+    $('participant-count').textContent = String(schedule.participantCount).padStart(2, '0');
+    $('participant-label').textContent = { one: 'участник', few: 'участника', many: 'участников' }[participantPlural.select(schedule.participantCount)];
     $('platform-count').textContent = String(schedule.platforms.length).padStart(2, '0');
     tick();
   }
