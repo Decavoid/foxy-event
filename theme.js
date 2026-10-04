@@ -23,8 +23,10 @@
     const color = document.querySelector('meta[name="theme-color"]');
     if (color) color.content = theme === 'dark' ? '#141a12' : '#f4f3ed';
     if (toggle) {
+      const t = window.RetroI18n.t;
       toggle.setAttribute('aria-pressed', String(theme === 'dark'));
-      toggle.title = theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему';
+      toggle.setAttribute('aria-label', t('darkTheme'));
+      toggle.title = t(theme === 'dark' ? 'enableLightTheme' : 'enableDarkTheme');
     }
   }
 
@@ -58,4 +60,5 @@
     preference = validPreference(event.newValue);
     applyTheme();
   });
+  window.addEventListener('retro-languagechange', applyTheme);
 })();
